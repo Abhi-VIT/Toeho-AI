@@ -10,5 +10,5 @@ driver.get(f"https://www.amazon.in/s?k={query}&crid=2A41AOZINQJRF&sprefix=lapto%
 elem = driver.find_element(By.CLASS_NAME, 'puis-card-container')
 print(elem.text)
 
-time.sleep(6)
+time.sleep(5)
 driver.quit()
