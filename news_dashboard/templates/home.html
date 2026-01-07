@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="flex flex-col items-center justify-center pt-16">
+    <div class="text-center max-w-2xl">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">
+            Analyze News Trends Instantly
+        </h1>
+        <p class="text-lg text-gray-600 mb-10">
+            Enter a news website URL to extract headlines, analyze sentiment, categorize topics, and identify key people
+            and organizations using AI.
+        </p>
+    </div>
+
+    <div class="w-full max-w-xl bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+        <form method="POST" action="{% url 'dashboard' %}" id="analyzeForm">
+            {% csrf_token %}
+            <div class="mb-6">
+                <label for="url" class="block text-gray-700 font-semibold mb-2">News Source URL</label>
+                <input type="url" name="url" id="url" placeholder="https://www.thehindu.com/" required
+                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    value="https://www.thehindu.com/">
+                <p class="text-sm text-gray-500 mt-2">Currently optimized for The Hindu and similar structures.</p>
+            </div>
+
+            {% if error %}
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded" role="alert">
+                <p class="font-bold">Error</p>
+                <p>{{ error }}</p>
+            </div>
+            {% endif %}
+
+            <button type="submit" id="submitBtn"
+                class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center transform hover:scale-[1.02]">
+                <span>Analyze Now</span>
+            </button>
+        </form>
+
+        <!-- Loading Spinner -->
+        <div id="loading" class="hidden mt-6 text-center">
+            <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-10 w-10 mx-auto mb-3">
+            </div>
+            <p class="text-gray-600 font-medium">Scraping and crunching data... This may take a few seconds.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById('analyzeForm');
+    const loading = document.getElementById('loading');
+    const btn = document.getElementById('submitBtn');
+
+    form.addEventListener('submit', function () {
+        loading.classList.remove('hidden');
+        btn.classList.add('opacity-50', 'cursor-not-allowed');
+        btn.disabled = true;
+        btn.innerHTML = 'Processing...';
+    });
+</script>
+{% endblock %}

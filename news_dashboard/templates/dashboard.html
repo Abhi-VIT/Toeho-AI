@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="space-y-10">
+
+    <!-- Header -->
+    <div
+        class="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">Analysis Report</h1>
+            <p class="text-gray-500 mt-1">Source: <a href="{{ url }}" target="_blank"
+                    class="text-blue-600 hover:underline">{{ url }}</a></p>
+        </div>
+        <div class="mt-4 md:mt-0 text-center">
+            <span class="block text-3xl font-extrabold text-blue-600">{{ total_articles }}</span>
+            <span class="text-sm text-gray-500 font-medium uppercase tracking-wide">Articles Processed</span>
+        </div>
+    </div>
+
+    <!-- Advanced Analysis Grid 1 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        <!-- Word Frequency -->
+        <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 lg:col-span-2">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Topic Trends: Frequent Words</h2>
+            {% if plots.word_freq %}
+            <img src="data:image/png;base64,{{ plots.word_freq }}" alt="Word Frequency"
+                class="w-full h-auto rounded-lg">
+            {% else %}
+            <p class="text-gray-500 text-center py-10">No word data available.</p>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!-- Advanced Analysis Grid 2 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        <!-- Sentiment Pie -->
+        <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Overall Sentiment</h2>
+            {% if plots.sentiment_pie %}
+            <img src="data:image/png;base64,{{ plots.sentiment_pie }}" alt="Sentiment Distribution"
+                class="w-full h-auto rounded-lg">
+            {% else %}
+            <p class="text-gray-500 text-center py-10">No sentiment data available.</p>
+            {% endif %}
+        </div>
+
+        <!-- Sentiment Heatmap -->
+        <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Sentiment Heatmap</h2>
+            {% if plots.sentiment_heatmap %}
+            <img src="data:image/png;base64,{{ plots.sentiment_heatmap }}" alt="Sentiment Heatmap"
+                class="w-full h-auto rounded-lg">
+            {% else %}
+            <p class="text-gray-500 text-center py-10">No heatmap data available.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Topic Modeling -->
+    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">AI Topic Discovery (LDA)</h2>
+        <p class="text-gray-600 mb-4 text-sm">Automatic clustering of articles into latent topics based on content
+            patterns.</p>
+        {% if plots.topic_dist %}
+        <img src="data:image/png;base64,{{ plots.topic_dist }}" alt="Topic Modeling" class="w-full h-auto rounded-lg">
+        {% else %}
+        <p class="text-gray-500 text-center py-10">Topic modeling requires more data to generate meaningful results.</p>
+        {% endif %}
+    </div>
+
+    <!-- Original Basic Charts Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        <!-- Category Chart -->
+        <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Category Distribution</h2>
+            {% if plots.category_dist %}
+            <img src="data:image/png;base64,{{ plots.category_dist }}" alt="Category Distribution"
+                class="w-full h-auto rounded-lg">
+            {% else %}
+            <p class="text-gray-500 text-center py-10">No data available for categories.</p>
+            {% endif %}
+        </div>
+
+        <!-- Sentiment Chart -->
+        <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Sentiment Breakdown</h2>
+            {% if plots.sentiment_cat %}
+            <img src="data:image/png;base64,{{ plots.sentiment_cat }}" alt="Sentiment Analysis"
+                class="w-full h-auto rounded-lg">
+            {% else %}
+            <p class="text-gray-500 text-center py-10">No data available for sentiment.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Details Table -->
+    <div class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+        <div class="p-6 border-b border-gray-100">
+            <h2 class="text-xl font-bold text-gray-800">Latest Articles & Insights</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 text-gray-600 uppercase text-xs tracking-wider">
+                        <th class="px-6 py-4 font-semibold">Headline</th>
+                        <th class="px-6 py-4 font-semibold">Category</th>
+                        <th class="px-6 py-4 font-semibold text-center">Sentiment</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for article in articles %}
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-4">
+                            <a href="{{ article.url }}" target="_blank"
+                                class="text-gray-800 font-medium hover:text-blue-600 hover:underline">
+                                {{ article.headline }}
+                            </a>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-3 py-1 text-xs font-semibold rounded-full 
+                                {% if article.Mapped_Category == 'Politics' %}bg-red-100 text-red-800
+                                {% elif article.Mapped_Category == 'Sports' %}bg-green-100 text-green-800
+                                {% elif article.Mapped_Category == 'Tech' %}bg-blue-100 text-blue-800
+                                {% elif article.Mapped_Category == 'Business' %}bg-purple-100 text-purple-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ article.Mapped_Category }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="inline-block px-2 py-1 text-xs font-bold rounded 
+                                {% if article.sentiment_label == 'Positive' %}text-green-600 bg-green-50 border border-green-200
+                                {% elif article.sentiment_label == 'Negative' %}text-red-600 bg-red-50 border border-red-200
+                                {% else %}text-gray-600 bg-gray-50 border border-gray-200{% endif %}">
+                                {{ article.sentiment_label }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="px-6 py-8 text-center text-gray-500">No articles found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- NER Section -->
+    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+        <h2 class="text-xl font-bold text-gray-800 mb-6 border-b pb-2">Named Entity Recognition (NER)</h2>
+        <p class="text-gray-600 mb-6">Top people, organizations, and locations identified in the news coverage.</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="flex flex-col">
+                <h3 class="font-semibold text-center mb-3 text-indigo-600">Top People</h3>
+                {% if plots.top_people %}
+                <img src="data:image/png;base64,{{ plots.top_people }}"
+                    class="rounded shadow-sm border border-gray-100">
+                {% else %}
+                <div class="h-40 bg-gray-50 rounded flex items-center justify-center text-gray-400 text-sm">No Person
+                    data</div>
+                {% endif %}
+            </div>
+
+            <div class="flex flex-col">
+                <h3 class="font-semibold text-center mb-3 text-emerald-600">Top Organizations</h3>
+                {% if plots.top_orgs %}
+                <img src="data:image/png;base64,{{ plots.top_orgs }}" class="rounded shadow-sm border border-gray-100">
+                {% else %}
+                <div class="h-40 bg-gray-50 rounded flex items-center justify-center text-gray-400 text-sm">No Org data
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="flex flex-col">
+                <h3 class="font-semibold text-center mb-3 text-rose-600">Top Locations</h3>
+                {% if plots.top_locs %}
+                <img src="data:image/png;base64,{{ plots.top_locs }}" class="rounded shadow-sm border border-gray-100">
+                {% else %}
+                <div class="h-40 bg-gray-50 rounded flex items-center justify-center text-gray-400 text-sm">No Location
+                    data</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-8">
+        <a href="{% url 'home' %}"
+            class="inline-block bg-gray-800 text-white font-semibold py-3 px-8 rounded-lg hover:bg-gray-900 transition shadow-lg">
+            Analyze Another URL
+        </a>
+    </div>
+
+</div>
+{% endblock %}
