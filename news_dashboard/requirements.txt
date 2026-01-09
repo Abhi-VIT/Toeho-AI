@@ -1,0 +1,10 @@
+django
+pandas
+matplotlib
+seaborn
+spacy
+textblob
+beautifulsoup4
+selenium
+scikit-learn
+numpy

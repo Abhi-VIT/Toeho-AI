@@ -150,7 +150,7 @@ def scrape_and_process(base_url):
                     seen_urls.add(href)
         
         # Limit to 15 articles as per requirement
-        links = links[:15]
+        links = links[:50]
         
         for link in links:
             try:
